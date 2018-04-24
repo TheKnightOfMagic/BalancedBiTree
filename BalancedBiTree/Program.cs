@@ -1,12 +1,214 @@
 ﻿using System;
 
-namespace BalancedBiTree
-{
-    class Program
+namespace ADS { 
+    class Test
     {
-        static void Main(string[] args)
+        static void Main(string []args)
         {
-            Console.WriteLine("Hello World!");
+            ADSTree t = new ADSTree();
+
+            t.insert(43);
+            t.insert(18);
+            t.insert(22);
+            t.insert(9);
+            t.insert(21);
+            t.insert(6);
+            t.insert(8);
+            t.insert(20);
+            t.insert(63);
+            t.insert(50);
+
+            t.printTree(TraverseOrder.InOrder);
+        }
+    }
+    public enum TraverseOrder
+    {
+        InOrder,
+        PreOrder,
+        PostOrder
+    }
+
+    public class ADSTree
+    {
+        private ADSNode root;
+
+        public sealed class ADSNode
+        {
+            public ADSNode left;
+            public ADSNode right;
+            public int key;
+            public int cardinality;  //  Increment each time duplicates are added
+            public int height;
+        }
+
+        public ADSTree()
+        {
+            root = null;
+        }
+       
+        // Return the node where value is located
+        public ADSNode find(int value)
+        {
+            //use this to find the ending nodes The final children blah b kaajsdj
+            int counter = 0;
+            ADSNode current = new ADSNode();
+            current = root;
+            while (current != null)
+            {
+                if (value > current.key)
+                {
+                    current = current.right;
+                }
+                else
+                {
+                    current = current.left;
+                }
+            }
+            return current;
+        }
+        public ADSNode unbalanceChecker(ADSNode current)
+        {
+            int difference = Math.Abs(current.left.height - current.right.height);
+            if(difference >= 2)
+            {
+                return current;
+
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        // Inserts a node into the tree and maintains its balance
+        public void insert(int value)
+        {
+            string inbalanceType = "";
+            bool imbalance = false;
+
+            ADSNode node = new ADSNode() { key = value };
+            if (root == null)
+            {
+                root = node;
+                return;
+            }
+
+           
+            ADSNode current = root;
+            ADSNode parent;
+
+            ADSNode unbalancedNode;
+            //inserts node
+            while (true)
+            {
+                parent = current;
+
+                if (current.key < value)
+                {
+                    current.height++;
+                    current = current.left;
+                    unbalancedNode = unbalanceChecker(parent);
+
+                    if (current == null)
+                    {
+                        parent.left = node;
+                        break;
+                    }
+                }
+                else
+                {
+                    current.height++;
+                    current = current.right;
+                    unbalancedNode = unbalanceChecker(parent);
+
+                    if (current == null)
+                    {
+                        parent.right = node;
+                        break;
+                    }
+                }
+            }
+            //Find inbalance type
+            if (unbalancedNode != null) {
+                for (int i = 0; i < 2; i++) {
+                    current = unbalancedNode;
+
+
+                    if (current.right.height > current.left.height)
+                    {
+                        current = current.right;
+                        inbalanceType += "R";
+                    }
+                    else
+                    {
+                        current = current.left;
+                        inbalanceType += "L";
+                    }
+
+                }
+                balanceIt(inbalanceType, unbalancedNode);
+            }
+        }
+        public void balanceIt(string inbalanceType, ADSNode unbalancedNode)
+        {
+            ADSNode newRoot;
+            ADSNode temp;
+            if (inbalanceType == "LR")
+            {
+                newRoot = unbalancedNode.left;
+                newRoot.right = newRoot.left;
+                newRoot.left = null;
+                temp = unbalancedNode;
+                newRoot.right = temp;
+                unbalancedNode = newRoot; 
+
+
+            }else if(inbalanceType == "RL"){
+                newRoot = unbalancedNode.right;
+                temp = unbalancedNode;
+                newRoot.left = temp;
+                newRoot.right = unbalancedNode.right;
+                unbalancedNode = newRoot;
+
+
+            }else if (inbalanceType == "RR")
+            {
+
+                newRoot = unbalancedNode.right;
+                temp = unbalancedNode;
+                newRoot.left = temp;
+                unbalancedNode = newRoot;
+                
+
+            }
+            else
+            {
+                newRoot = unbalancedNode.left;
+                temp = unbalancedNode;
+                newRoot.right = temp;
+                unbalancedNode = newRoot;
+            }
+        }
+          
+
+
+      
+        // Print the tree in a particular order
+        public void printTree(TraverseOrder order)
+        {
+
+            ADSNode current = root;
+            ADSNode last;
+            while (current.left != null)
+            {
+                if (current.left.left != null)
+                {
+                    Console.WriteLine(current.key);
+                    current = current.left;
+                }
+
+            }
+
         }
     }
 }
