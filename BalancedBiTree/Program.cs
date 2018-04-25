@@ -105,7 +105,9 @@ namespace ADS {
 
                 if (current.key < value)
                 {
-                    current.height++;
+                    if (current.right == null && current.left == null) {
+                        current.height++;
+                    }
                     current = current.left;
                     unbalancedNode = unbalanceChecker(parent);
 
@@ -117,7 +119,10 @@ namespace ADS {
                 }
                 else
                 {
-                    current.height++;
+                    if (current.right == null && current.left == null) {
+                        current.height++;
+                    }
+                    
                     current = current.right;
                     unbalancedNode = unbalanceChecker(parent);
 
@@ -155,28 +160,41 @@ namespace ADS {
             ADSNode temp;
             if (inbalanceType == "LR")
             {
-                newRoot = unbalancedNode.left;
-                newRoot.right = newRoot.left;
-                newRoot.left = null;
+                newRoot = unbalancedNode.left.right;
+                // :::
+                newRoot.height += 2;
+                newRoot.left = unbalancedNode.left;
+                unbalancedNode.left = null;
+                unbalancedNode.left.right = null;
                 temp = unbalancedNode;
                 newRoot.right = temp;
+                newRoot.right.height -= 1;
                 unbalancedNode = newRoot; 
 
 
             }else if(inbalanceType == "RL"){
-                newRoot = unbalancedNode.right;
+                newRoot = unbalancedNode.right.left;
+                newRoot.height += 2;
+
+                newRoot.right = unbalancedNode.right;
+                unbalancedNode.right = null;
                 temp = unbalancedNode;
                 newRoot.left = temp;
-                newRoot.right = unbalancedNode.right;
+                newRoot.left.height -= 1;
                 unbalancedNode = newRoot;
+
+
 
 
             }else if (inbalanceType == "RR")
             {
 
                 newRoot = unbalancedNode.right;
+                newRoot.height += 1;
+                newRoot.right.height += 1;
                 temp = unbalancedNode;
                 newRoot.left = temp;
+                newRoot.left.height -= 1;
                 unbalancedNode = newRoot;
                 
 
@@ -184,8 +202,11 @@ namespace ADS {
             else
             {
                 newRoot = unbalancedNode.left;
+                newRoot.height += 1;
+                newRoot.left.height += 1;
                 temp = unbalancedNode;
                 newRoot.right = temp;
+                newRoot.right.height -= 1;
                 unbalancedNode = newRoot;
             }
         }
@@ -201,11 +222,10 @@ namespace ADS {
             ADSNode last;
             while (current.left != null)
             {
-                if (current.left.left != null)
-                {
+              
                     Console.WriteLine(current.key);
                     current = current.left;
-                }
+                
 
             }
 
