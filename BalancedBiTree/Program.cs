@@ -7,10 +7,10 @@ namespace ADS {
         {
             ADSTree t = new ADSTree();
 
-            t.insert(43);
-            t.insert(18);
-            t.insert(22);
-            t.insert(9);
+            t.insert(1);
+            t.insert(2);
+            t.insert(3);
+            t.insert(-1);
             t.insert(21);
             t.insert(6);
             t.insert(8);
@@ -43,7 +43,6 @@ namespace ADS {
 
         public ADSTree()
         {
-            root = null;
         }
        
         // Return the node where value is located
@@ -68,16 +67,29 @@ namespace ADS {
         }
         public ADSNode unbalanceChecker(ADSNode current)
         {
-            int difference = Math.Abs(current.left.height - current.right.height);
-            if(difference >= 2)
+
+            if (current.left == null || current.right == null)
             {
-                return current;
+                int difference = Math.Abs(current.left.height - current.right.height);
+                if (difference >= 2)
+                {
+                    return current;
+
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return null;
+        }
+        public void updateHeight(ADSNode root)
+        {
+            if (current.left != null)
+            {
 
             }
-            else
-            {
-                return null;
-            }
+
         }
 
         // Inserts a node into the tree and maintains its balance
@@ -97,19 +109,19 @@ namespace ADS {
             ADSNode current = root;
             ADSNode parent;
 
-            ADSNode unbalancedNode;
+            ADSNode unbalancedNode = null;
             //inserts node
             while (true)
             {
                 parent = current;
 
-                if (current.key < value)
+                if (current.key > value)
                 {
                     if (current.right == null && current.left == null) {
                         current.height++;
                     }
                     current = current.left;
-                    unbalancedNode = unbalanceChecker(parent);
+                    //unbalancedNode = unbalanceChecker(parent);
 
                     if (current == null)
                     {
@@ -124,7 +136,7 @@ namespace ADS {
                     }
                     
                     current = current.right;
-                    unbalancedNode = unbalanceChecker(parent);
+                    //unbalancedNode = unbalanceChecker(parent);
 
                     if (current == null)
                     {
@@ -133,6 +145,7 @@ namespace ADS {
                     }
                 }
             }
+            updateHeight(root);
             //Find inbalance type
             if (unbalancedNode != null) {
                 for (int i = 0; i < 2; i++) {
@@ -188,15 +201,11 @@ namespace ADS {
 
             }else if (inbalanceType == "RR")
             {
-
-                newRoot = unbalancedNode.right;
-                newRoot.height += 1;
-                newRoot.right.height += 1;
-                temp = unbalancedNode;
-                newRoot.left = temp;
-                newRoot.left.height -= 1;
-                unbalancedNode = newRoot;
+                ADSNode over = unbalancedNode.right.left;
+                unbalancedNode.right.left = unbalancedNode;
+                unbalancedNode.right = over;
                 
+
 
             }
             else
@@ -205,6 +214,10 @@ namespace ADS {
                 newRoot.height += 1;
                 newRoot.left.height += 1;
                 temp = unbalancedNode;
+                while (newRoot.right != null)
+                {
+                    newRoot = newRoot.right;
+                }
                 newRoot.right = temp;
                 newRoot.right.height -= 1;
                 unbalancedNode = newRoot;
@@ -217,6 +230,22 @@ namespace ADS {
         // Print the tree in a particular order
         public void printTree(TraverseOrder order)
         {
+            //in order is basically using the tree to print out everything in order: 6, 8, 9, 18, 20, 21, 22, 43, 50, 63
+
+            /**
+             
+             t.insert(43);
+            t.insert(18);
+            t.insert(22);
+            t.insert(9);
+            t.insert(21);
+            t.insert(6);
+            t.insert(8);
+            t.insert(20);
+            t.insert(63);
+            t.insert(50);
+
+             * **/
 
             ADSNode current = root;
             ADSNode last;
