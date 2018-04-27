@@ -7,10 +7,10 @@ namespace ADS {
         {
             ADSTree t = new ADSTree();
 
-            t.insert(1);
-            t.insert(2);
-            t.insert(3);
-            t.insert(-1);
+            t.insert(43);
+            t.insert(18);
+            t.insert(22);
+            t.insert(9);
             t.insert(21);
             t.insert(6);
             t.insert(8);
@@ -67,10 +67,21 @@ namespace ADS {
         }
         public ADSNode unbalanceChecker(ADSNode current)
         {
+            int right;
+            int left;
 
-            if (current.left == null || current.right == null)
-            {
-                int difference = Math.Abs(current.left.height - current.right.height);
+            if (current.left == null)
+                left = 0;
+            else
+                left = current.left.height;
+
+            if (current.right == null)
+                right = 0;
+            else
+                right = current.right.height;
+      
+          
+                int difference = Math.Abs(left- right);
                 if (difference >= 2)
                 {
                     return current;
@@ -80,15 +91,19 @@ namespace ADS {
                 {
                     return null;
                 }
-            }
-            return null;
+            
+            
         }
-        public void updateHeight(ADSNode root)
+        public ADSNode updateHeight(ADSNode node)
         {
-            if (current.left != null)
-            {
+            if (node == null) return null;
 
-            }
+            if(node.left != null)
+                node.height = updateHeight(node.left).height + 1;
+            if (node.right != null)
+                updateHeight(node.right);
+
+            return node;
 
         }
 
@@ -117,11 +132,9 @@ namespace ADS {
 
                 if (current.key > value)
                 {
-                    if (current.right == null && current.left == null) {
-                        current.height++;
-                    }
+                    
                     current = current.left;
-                    //unbalancedNode = unbalanceChecker(parent);
+                    unbalancedNode = unbalanceChecker(parent);
 
                     if (current == null)
                     {
@@ -131,12 +144,10 @@ namespace ADS {
                 }
                 else
                 {
-                    if (current.right == null && current.left == null) {
-                        current.height++;
-                    }
+                   
                     
                     current = current.right;
-                    //unbalancedNode = unbalanceChecker(parent);
+                    unbalancedNode = unbalanceChecker(parent);
 
                     if (current == null)
                     {
@@ -175,13 +186,13 @@ namespace ADS {
             {
                 newRoot = unbalancedNode.left.right;
                 // :::
-                newRoot.height += 2;
+                
                 newRoot.left = unbalancedNode.left;
                 unbalancedNode.left = null;
                 unbalancedNode.left.right = null;
                 temp = unbalancedNode;
                 newRoot.right = temp;
-                newRoot.right.height -= 1;
+               
                 unbalancedNode = newRoot; 
 
 
@@ -211,13 +222,9 @@ namespace ADS {
             else
             {
                 newRoot = unbalancedNode.left;
-                newRoot.height += 1;
-                newRoot.left.height += 1;
                 temp = unbalancedNode;
-                while (newRoot.right != null)
-                {
+                
                     newRoot = newRoot.right;
-                }
                 newRoot.right = temp;
                 newRoot.right.height -= 1;
                 unbalancedNode = newRoot;
@@ -248,16 +255,27 @@ namespace ADS {
              * **/
 
             ADSNode current = root;
-            ADSNode last;
-            while (current.left != null)
+        
+                traverse(current);
+            
+           
+
+        }
+
+        public void traverse(ADSNode node)
+        {
+            if(node == null)
             {
-              
-                    Console.WriteLine(current.key);
-                    current = current.left;
-                
-
+                return;
             }
+            if(node.left != null)
+                traverse(node.left);
+            Console.WriteLine(node.key);
 
+            if (node.right != null)
+                traverse(node.right);
+
+            return;
         }
     }
 }
