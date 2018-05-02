@@ -38,244 +38,178 @@ namespace ADS {
             public ADSNode right;
             public int key;
             public int cardinality;  //  Increment each time duplicates are added
-            public int height;
+            public int height;  // Height of this node
         }
 
         public ADSTree()
         {
-        }
-       
-        // Return the node where value is located
-        public ADSNode find(int value)
-        {
-            //use this to find the ending nodes The final children blah b kaajsdj
-            int counter = 0;
-            ADSNode current = new ADSNode();
-            current = root;
-            while (current != null)
-            {
-                if (value > current.key)
-                {
-                    current = current.right;
-                }
-                else
-                {
-                    current = current.left;
-                }
-            }
-            return current;
-        }
-        public ADSNode unbalanceChecker(ADSNode current)
-        {
-            int right;
-            int left;
-
-            if (current.left == null)
-                left = 0;
-            else
-                left = current.left.height;
-
-            if (current.right == null)
-                right = 0;
-            else
-                right = current.right.height;
-      
-          
-                int difference = Math.Abs(left- right);
-                if (difference >= 2)
-                {
-                    return current;
-
-                }
-                else
-                {
-                    return null;
-                }
-            
-            
-        }
-        public ADSNode updateHeight(ADSNode node)
-        {
-            if (node == null) return null;
-
-            if(node.left != null)
-                node.height = updateHeight(node.left).height + 1;
-            if (node.right != null)
-                updateHeight(node.right);
-
-            return node;
-
+            root = null;
         }
 
         // Inserts a node into the tree and maintains its balance
         public void insert(int value)
         {
-            string inbalanceType = "";
-            bool imbalance = false;
-
-            ADSNode node = new ADSNode() { key = value };
             if (root == null)
-            {
-                root = node;
-                return;
-            }
-
-           
-            ADSNode current = root;
-            ADSNode parent;
-
-            ADSNode unbalancedNode = null;
-            //inserts node
-            while (true)
-            {
-                parent = current;
-
-                if (current.key > value)
-                {
-                    
-                    current = current.left;
-                    unbalancedNode = unbalanceChecker(parent);
-
-                    if (current == null)
-                    {
-                        parent.left = node;
-                        break;
-                    }
-                }
-                else
-                {
-                   
-                    
-                    current = current.right;
-                    unbalancedNode = unbalanceChecker(parent);
-
-                    if (current == null)
-                    {
-                        parent.right = node;
-                        break;
-                    }
-                }
-            }
-            updateHeight(root);
-            //Find inbalance type
-            if (unbalancedNode != null) {
-                for (int i = 0; i < 2; i++) {
-                    current = unbalancedNode;
-
-
-                    if (current.right.height > current.left.height)
-                    {
-                        current = current.right;
-                        inbalanceType += "R";
-                    }
-                    else
-                    {
-                        current = current.left;
-                        inbalanceType += "L";
-                    }
-
-                }
-                balanceIt(inbalanceType, unbalancedNode);
-            }
+                root = new ADSNode() { key = value };
+            else
+                root = insert(value, root);
         }
-        public void balanceIt(string inbalanceType, ADSNode unbalancedNode)
+        private ADSNode insert(int value, ADSNode node)
         {
-            ADSNode newRoot;
-            ADSNode temp;
-            if (inbalanceType == "LR")
+            if (node == null) return new ADSNode() { key = value };
+
+            if (node.key == value)
+                node.cardinality++;
+            else if (node.key < value)
             {
-                newRoot = unbalancedNode.left.right;
-                // :::
-                
-                newRoot.left = unbalancedNode.left;
-                unbalancedNode.left = null;
-                unbalancedNode.left.right = null;
-                temp = unbalancedNode;
-                newRoot.right = temp;
-               
-                unbalancedNode = newRoot; 
-
-
-            }else if(inbalanceType == "RL"){
-                newRoot = unbalancedNode.right.left;
-                newRoot.height += 2;
-
-                newRoot.right = unbalancedNode.right;
-                unbalancedNode.right = null;
-                temp = unbalancedNode;
-                newRoot.left = temp;
-                newRoot.left.height -= 1;
-                unbalancedNode = newRoot;
-
-
-
-
-            }else if (inbalanceType == "RR")
-            {
-                ADSNode over = unbalancedNode.right.left;
-                unbalancedNode.right.left = unbalancedNode;
-                unbalancedNode.right = over;
-                
-
+                node.right = insert(value, node.right);
 
             }
             else
             {
-                newRoot = unbalancedNode.left;
-                temp = unbalancedNode;
-                
-                    newRoot = newRoot.right;
-                newRoot.right = temp;
-                newRoot.right.height -= 1;
-                unbalancedNode = newRoot;
+                node.left = insert(value, node.left);
             }
-        }
-          
-
-
-      
-        // Print the tree in a particular order
-        public void printTree(TraverseOrder order)
-        {
-            //in order is basically using the tree to print out everything in order: 6, 8, 9, 18, 20, 21, 22, 43, 50, 63
-
-            /**
-             
-             t.insert(43);
-            t.insert(18);
-            t.insert(22);
-            t.insert(9);
-            t.insert(21);
-            t.insert(6);
-            t.insert(8);
-            t.insert(20);
-            t.insert(63);
-            t.insert(50);
-
-             * **/
-
-            ADSNode current = root;
-        
-                traverse(current);
-            
-           
+            return updateHeight(node);
 
         }
-
-        public void traverse(ADSNode node)
+        public ADSNode updateHeight(ADSNode node)
         {
-            if(node == null)
+            int left = (node.left == null) ? 0 : node.left.height + 1;
+            int right = (node.right == null) ? 0 : node.right.height + 1;
+
+            int height = Math.Max(left, right);
+            node.height = height;
+
+            int difference = Math.Abs(right - left);
+
+            if (difference >= 2)
             {
-                return;
+                node = balance(node);
             }
-            if(node.left != null)
-                traverse(node.left);
-            Console.WriteLine(node.key);
 
-            if (node.right != null)
-                traverse(node.right);
+            return node;
 
-            return;
+        }
+        private ADSNode balance(ADSNode node)
+        {
+            bool first = checkType(node);
+            bool second = (first) ? checkType(node.left) : checkType(node.right);
+
+            if (first && second)
+            {
+                return rightRotation(node);
+            }
+            else if (!first && !second)
+            {
+                return rightRotation(node);
+            }
+            else if (first && !second)
+            {
+                node = leftRightRotation(node);
+                return rightRotation(node);
+            }
+            else if (!first && second)
+            {
+                node = rightLeftRotation(node);
+                return leftRotation(node);
+
+            }
+            return updateHeight(node);
+
+        }
+
+        private bool checkType(ADSNode node)
+        {
+            int left = (node.left == null) ? 0 : node.left.height + 1;
+            int right = (node.right == null) ? 0 : node.right.height + 1;
+
+            return left > right;
+
+        }
+        private ADSNode rightRotation(ADSNode node)
+        {
+            //should return newRoot
+            ADSNode newRoot = node.left;
+            ADSNode temp = (newRoot.right == null) ? null : newRoot.right;
+            newRoot.right = node;
+
+            node.left = temp;
+
+            return newRoot;
+
+        }
+
+        private ADSNode leftRotation(ADSNode node)
+        {
+            ADSNode newRoot = node.right;
+            ADSNode temp = (newRoot.left == null) ? null : newRoot.left;
+            newRoot.left = node;
+
+            node.right = temp;
+
+            return newRoot;
+        }
+
+        private ADSNode leftRightRotation(ADSNode node)
+        {
+            ADSNode temp = node.left;
+
+            ADSNode newRoot = node.left.right;
+            temp.right = null;
+            node.left = newRoot;
+            newRoot.left = temp;
+
+            return node;
+
+        }
+        private ADSNode rightLeftRotation(ADSNode node)
+        {
+            ADSNode temp = node.right;
+
+            ADSNode newRoot = node.right.left;
+            temp.left = null;
+            node.right = newRoot;
+            newRoot.right = temp;
+
+            return node;
+        }
+        // Print the tree in a particular order
+        public void TreePrinter(TraverseOrder traverse){
+
+            if(traverse == TraverseOrder.InOrder){
+                InOrderTraversal(root);
+            }else if(traverse == TraverseOrder.PreOrder){
+                PreOrderTraversal(root);
+            }else{
+                PostOrderTraversal(root);
+            }
+        }
+        public static void PreOrderTraversal(ADSNode root)
+        {
+            if (root == null) return;
+
+            Console.WriteLine(root.key); // process the root
+            PreOrderTraversal(root.left);// process the left
+            PreOrderTraversal(root.right);// process the right
+        }
+
+        public static void InOrderTraversal(ADSNode root)
+        {
+            if (root == null) return;
+
+            InOrderTraversal(root.left);// process the left
+            Console.WriteLine(root.key); // process the root
+            InOrderTraversal(root.right);// process the right
+        }
+
+        public static void PostOrderTraversal(ADSNode root)
+        {
+            if (root == null) return;
+
+            PostOrderTraversal(root.left);// process the left            
+            PostOrderTraversal(root.right);// process the right
+            Console.WriteLine(root.key); // process the root
         }
     }
+          
 }
